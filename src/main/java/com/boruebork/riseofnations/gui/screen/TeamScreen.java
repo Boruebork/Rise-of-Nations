@@ -1,0 +1,164 @@
+package com.boruebork.riseofnations.gui.screen;
+
+import com.boruebork.riseofnations.RiseofNations;
+import com.boruebork.riseofnations.gui.buttons.TextureButton;
+import com.boruebork.riseofnations.network.packets.CreateNewTeamData;
+import com.boruebork.riseofnations.network.packets.LeaveTeamPacket;
+import com.boruebork.riseofnations.network.packets.RequestTeamData;
+import com.boruebork.riseofnations.team.TeamEntry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import static com.boruebork.riseofnations.network.NetowrkConstants.NULL;
+
+public class TeamScreen extends Screen {
+    private TextureButton clb;
+    private Minecraft MC;
+    public String teamName;
+    public Map<String, TeamEntry> teams;
+    public String leaderName;
+    public boolean hasTeam;
+    public List<String> players;
+    private boolean seePlayers = false;
+    private List<Button> teamButtons;
+    private Button LeaveTeam;
+    private static final Identifier CHANGE_LEADER_BUTTON = Identifier.fromNamespaceAndPath(RiseofNations.MODID, "textures/gui/team/clb.png");
+    public TeamScreen() {
+        super(Component.translatable("gui.riseofnations.team"));
+        this.MC = Minecraft.getInstance();
+        this.teamName = NULL;
+    }
+
+    @Override
+    protected void init() {
+        assert MC.player != null;
+        ClientPacketDistributor.sendToServer(new RequestTeamData(MC.player.getName().getString()));
+        super.init();
+    }
+    public void rebuildWidgets() {
+        if (Objects.equals(this.teamName, NULL)){
+            this.hasTeam = false;
+            System.out.println("Rebuilt widget for no team");
+            Button button = Button.builder(Component.literal("Create new Team"), this::createNewTeam).build();
+            button.setPosition(0, 0);
+            addRenderableWidget(button);
+        }else{
+            clearWidgets();
+            this.hasTeam = true;
+            Button seeMembers = Button.builder(Component.literal("See Members"), this::seeMemebers).build();
+            seeMembers.setPosition(0, 20);
+            Button focusButton = Button.builder(Component.literal("Focuses"), this::openFocusScreen).build();
+            Button leaveTeam = Button.builder(Component.literal("Leave Team"), this::leaveTeam).build();
+            Button destroyTeam = Button.builder(Component.literal("Disband Team"), this::destroyTeam).build();
+            focusButton.setPosition(this.width - 150, 0);
+            leaveTeam.setPosition(this.width-150, 20);
+            destroyTeam.setPosition(this.width -150, 40);
+            addRenderableWidget(leaveTeam);
+            addRenderableWidget(destroyTeam);
+            addRenderableWidget(focusButton);
+            addRenderableWidget(seeMembers);
+            System.out.println("Rebuilt widget!");
+        }
+
+    }
+
+    private void destroyTeam(Button button) {
+    }
+
+    private void leaveTeam(Button button) {
+        ClientPacketDistributor.sendToServer(new LeaveTeamPacket(MC.player.getName().getString(), this.teamName));
+    }
+
+    public void acceptNoTeamDataFromServer(){
+        System.err.println("No team data accepted from server!");
+        clearWidgets();
+        teamButtons = new ArrayList<>();
+        int i = 0;
+        for (String s : this.teams.keySet()){
+            System.out.println(s);
+            teamButtons.add(Button.builder(Component.literal(s), this::onTeamSelected).build());
+            teamButtons.getLast().setPosition(0, 20+20*i);
+            addRenderableWidget(teamButtons.getLast());
+            i++;
+        }
+        this.teamName = NULL;
+        rebuildWidgets();
+    }
+
+    private void onTeamSelected(Button button) {
+        int id = button.getY()/20;
+        
+    }
+
+    private void openFocusScreen(Button button) {
+        MC.setScreen(new FocusScreen());
+    }
+
+    EditBox teamNameEditbox;
+    private void createNewTeam(Button button) {
+        clearWidgets();
+        teamNameEditbox = new EditBox(this.font,0,0, 100, 20, Component.literal("Team Name"));
+        Button create = Button.builder(Component.literal("Create"), this::sendNewTeamPacket).build();
+        create.setPosition(0, 60);
+        addRenderableWidget(teamNameEditbox);
+        addRenderableWidget(create);
+    }
+    public void setToMainTeamScreen(){
+        Button button = Button.builder(Component.literal("See Members"), this::seeMemebers).build();
+        button.setPosition(0, 20);
+    }
+
+    private void seeMemebers(Button button) {
+        this.seePlayers = true;
+        clearWidgets();
+        Button toMainMenuButton = Button.builder(Component.literal("To main menu"), this::toMainMenu).build();
+        toMainMenuButton.setPosition(this.width-100, 0);
+        addRenderableWidget(toMainMenuButton);
+    }
+
+    private void toMainMenu(Button button) {
+        this.rebuildWidgets();
+        this.seePlayers = false;
+    }
+
+    public void sendNewTeamPacket(Button button){
+        ClientPacketDistributor.sendToServer(new CreateNewTeamData(this.teamNameEditbox.getValue(), MC.player.getName().getString()));
+
+        
+    }
+
+    private void changeLeader(Button button) {
+        assert MC.player != null;
+        //ClientPacketDistributor.sendToServer(new ChangeteamLeaderData(this.teamName, MC.player.getName().getString()));
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+        guiGraphics.drawString(this.font, this.teamName,this.width/2, 0, 0xFFFFFFFF);
+        if (this.seePlayers){
+            for (int i = 0; i < this.players.size(); ++i){
+                guiGraphics.drawString(this.getFont(), this.players.get(i), 0, i*10, 0xFFFFFFFF);
+            }
+        }
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        guiGraphics.fill(0, 0, this.width, this.height, 0xFFAAAAAA);
+
+        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+
+    }
+}
