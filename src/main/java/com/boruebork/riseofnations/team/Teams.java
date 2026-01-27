@@ -24,7 +24,7 @@ public class Teams extends SavedData {
         this.teamsForDat = new HashMap<>(teams);
     }
 
-    public static final Codec<Teams> CODEC =
+    /*public static final Codec<Teams> CODEC =
             RecordCodecBuilder.create(instance -> instance.group(
                     Codec.unboundedMap(
                                     Codec.STRING,
@@ -34,7 +34,9 @@ public class Teams extends SavedData {
             ).apply(instance, Teams::new));
 
     public static final SavedDataType<Teams> ID =
-            new SavedDataType<>("teams", Teams::new, CODEC);
+            new SavedDataType<>("teams", Teams::new, CODEC);*/
+
+
     public static final Codec<Teams> NEW_CODEC =
             RecordCodecBuilder.create(instance -> instance.group(
                     Codec.list(
@@ -42,6 +44,8 @@ public class Teams extends SavedData {
                     ).fieldOf("teams")
                     .forGetter(t -> t.NEW_TEAMS)
             ).apply(instance, Teams::new));
+
+
     public static final SavedDataType<Teams> NEW_ID =
             new SavedDataType<>("teams", Teams::new, NEW_CODEC);
     public Teams(List<TeamData> objects) {
@@ -49,7 +53,8 @@ public class Teams extends SavedData {
     }
 
 
-    /**A method to convert the extracted teams map to a cached object friendly version*/
+    /*
+    @Deprecated(forRemoval = true)
     public static Map<Team, TeamData> fromSerializable(Map<String, TeamEntry> data){
         Map<Team, TeamData> out = new HashMap<>();
 
@@ -66,7 +71,7 @@ public class Teams extends SavedData {
         }
         return out;
     }
-    /**Used to serialize the cached Teams map into a serializable version**/
+    @Deprecated(forRemoval = true)
     public static Map<String, TeamEntry> toSerialized(Map<Team, TeamData> teams){
         Map<String, TeamEntry> out = new HashMap<>();
 
@@ -85,7 +90,10 @@ public class Teams extends SavedData {
             ));
         }
         return out;
-    }
+    }*/
+
+
+
     // WORKS BASED ON THE CACHE (NULL-PROOF)
     public static TeamData getData(Team team){
         if (team == null) return null;
@@ -96,114 +104,109 @@ public class Teams extends SavedData {
         }
         return null;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static void playerJoinTeam(String team, String player){
-        if (team == null || player == null){
+    public static void playerJoinTeam(String teamName, String playerName){
+        if (teamName == null || playerName == null){
             return;
         }
-        for (Team t : RiseofNations.teams.TEAMS.keySet()){
-            if (t.name == team){
-                RiseofNations.teams.TEAMS.get(t).members.add(player);
+        for (TeamData t : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(t.teamName, teamName)){
+                t.members.add(playerName);
                 return;
             }
         }
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static void changeLeader(String teamName, String newLeaderName){
-        //TODO Do smth we need to simplify the key to an id and merge Team and TeamData
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.name, teamName)){
-
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(data.teamName, teamName)){
+                System.err.println("We don't have the cards right now!");
             }
         }
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static void disbandTeam(String teamName){
         if (teamName == null){
             return;
         }
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.name, teamName)){
-                RiseofNations.teams.TEAMS.remove(team);
+        int len = RiseofNations.teams.NEW_TEAMS.size();
+        for (int i = 0; i < len; ++i){
+            if (Objects.equals(RiseofNations.teams.NEW_TEAMS.get(i).teamName, teamName)){
+                RiseofNations.teams.NEW_TEAMS.remove(i);
                 return;
             }
         }
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static void kickPlayerFromTeam(String playerName, String teamName){
         if (!Teams.isPlayerOnTeam(playerName, teamName)){
             return;
         }
-        Team team = getTeam(teamName);
-        if (team != null){
-            if (RiseofNations.teams.TEAMS.get(team) != null){
-                RiseofNations.teams.TEAMS.get(team).members.remove(playerName);
+        int id = getTeamId(teamName);
+        if (id == -1){
+            return;
+        }
+        RiseofNations.teams.NEW_TEAMS.get(id).members.remove(playerName);
+    }
+    public static int getTeamId(String name){
+        List<TeamData> data = RiseofNations.teams.NEW_TEAMS;
+        for (int i = 0; i < data.size(); ++i){
+            if (Objects.equals(data.get(i).teamName, name)){
+                return i;
             }
         }
+        return -1;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static Team getTeam(String name){
+    public static TeamData getTeam(String name){
         if (name == null){
             return null;
         }
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.name, name)){
-                return team;
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(data.teamName, name)){
+                return data;
             }
         }
         return null;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static boolean isPlayerOnTeam(String player, String team){
         if (player == null || team == null){
             return false;
         }
         return team.equals(getPlayerTeamAsString(player));
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static String leaderOfTeamStr(Player player){
         if (player == null) return null;
         String name = player.getName().getString();
         return leaderOfTeamStr(name);
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static String leaderOfTeamStr(String player){
         if (player == null) return null;
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.leaderName, player)) return team.name;
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(data.leaderName, player)) return data.teamName;
         }
         return null;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static Team leaderOfTeamObj(Player player){
+    public static TeamData leaderOfTeamObj(Player player){
         if (player == null) return null;
         String name = player.getName().getString();
         return leaderOfTeamObj(name);
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static Team leaderOfTeamObj(String player){
+    public static TeamData leaderOfTeamObj(String player){
         if (player == null) return null;
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.leaderName, player)) return team;
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(data.leaderName, player)) return data;
         }
         return null;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static boolean isLeader(Player player){
         if (player == null) return false;
         String name = player.getName().getString();
         return isLeader(name);
 
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static boolean isLeader(String player){
         if (player == null) return false;
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            if (Objects.equals(team.leaderName, player)) return true;
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
+            if (Objects.equals(data.leaderName, player)) return true;
         }
         return false;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static boolean playersOnSameTeam(Player player1, Player player2) {
         if (player1 == null || player2 == null) return false;
         String first = player1.getName().getString();
@@ -212,47 +215,36 @@ public class Teams extends SavedData {
 
 
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static boolean playerOnSameTeam(String player1, String player2){
         if (player1 == null || player2 == null) return false;
         return Objects.equals(getPlayerTeamAsString(player1), getPlayerTeamAsString(player2));
 
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static Team getPlayerTeamAsObject(Player player){
+    public static TeamData getPlayerTeamAsObject(Player player){
         if (player == null) return null;
         String name = player.getName().getString();
         return getPlayerTeamAsObject(name);
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public static Team getPlayerTeamAsObject(String player){
+    public static TeamData getPlayerTeamAsObject(String player){
         if (player == null) return null;
-        for (Team team : RiseofNations.teams.TEAMS.keySet()){
-            TeamData data = RiseofNations.teams.TEAMS.get(team);
+        for (TeamData data : RiseofNations.teams.NEW_TEAMS){
             if (data.members.contains(player)){
-                return team;
+                return data;
             }
         }
         return null;
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static String getPlayerTeamAsString(Player player){
         if (player == null) return null;
-        Team team = getPlayerTeamAsObject(player);
-        if (team != null) {
-            return team.name;
-        }else{
-            return null;
-        }
+        return getPlayerTeamAsString(player.getName().getString());
     }
-    @Deprecated(since = "0.0.1", forRemoval = true)
     public static String getPlayerTeamAsString(String player){
         if (player == null) return null;
-        Team team = getPlayerTeamAsObject(player);
-        if (team != null) {
-            return team.name;
-        }else{
-            return null;
+        for (TeamData data: RiseofNations.teams.NEW_TEAMS){
+            if (data.members.contains(player)){
+                return data.teamName;
+            }
         }
+        return null;
     }
 }

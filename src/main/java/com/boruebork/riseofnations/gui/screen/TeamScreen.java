@@ -7,6 +7,7 @@ import com.boruebork.riseofnations.network.packets.CreateNewTeamData;
 import com.boruebork.riseofnations.network.packets.JoinTeamPacket;
 import com.boruebork.riseofnations.network.packets.LeaveTeamPacket;
 import com.boruebork.riseofnations.network.packets.RequestTeamData;
+import com.boruebork.riseofnations.team.TeamData;
 import com.boruebork.riseofnations.team.TeamEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,7 +28,7 @@ public class TeamScreen extends Screen {
     private TextureButton clb;
     private Minecraft MC;
     public String teamName;
-    public Map<String, TeamEntry> teams;
+    public List<TeamData> teams;
     public String leaderName;
     public boolean hasTeam;
     public List<String> players;
@@ -87,9 +88,9 @@ public class TeamScreen extends Screen {
         TeamList teamList = new TeamList(minecraft, 150, this.teams.size()*20, 0, 20);
         teamList.setParent(this);
         int i = 0;
-        for (String s : this.teams.keySet()){
-            System.out.println(s);
-            teamList.addTeam(Component.literal(s), i);
+        for (TeamData data : this.teams){
+            System.out.println(data.teamName);
+            teamList.addTeam(Component.literal(data.teamName), i);
             i++;
         }
         this.teamName = NULL;

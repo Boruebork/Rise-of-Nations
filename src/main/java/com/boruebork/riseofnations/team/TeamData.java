@@ -1,8 +1,12 @@
 package com.boruebork.riseofnations.team;
 
 import com.boruebork.riseofnations.focus.FocusData;
+import com.boruebork.riseofnations.network.util.RONStreamCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +24,35 @@ public class TeamData {
     public Set<Integer> completedFocuses;
     public int currentFocus;
     public int timeTillEndOfFocus;
+
+    public String teamName() {
+        return teamName;
+    }
+
+    public String leaderName() {
+        return leaderName;
+    }
+
+    public int color() {
+        return color;
+    }
+
+    public List<String> members() {
+        return members;
+    }
+
+    public Set<Integer> completedFocuses() {
+        return completedFocuses;
+    }
+
+    public int currentFocus() {
+        return currentFocus;
+    }
+
+    public int timeTillEndOfFocus() {
+        return timeTillEndOfFocus;
+    }
+
     public TeamData(List<String> members, Set<Integer> completedFocuses){
         this.members = members;
         this.completedFocuses = completedFocuses;
@@ -33,8 +66,14 @@ public class TeamData {
         this.currentFocus = -1;
         this.timeTillEndOfFocus = 0;
     }
-
-    public TeamData(List<String> members, List<ServerPlayer> membersAsServerPlayers, Set<Integer> completedFocuses, int currentFocus, int timeTillEndOfFocus) {
+    /**This constructor is use to create new teams**/
+    public TeamData(String teamName, String creatorName, List<String> members) {
+        this.teamName =teamName;
+        this.leaderName = creatorName;
+        this.members = members;
+        this.completedFocuses = new HashSet<>();
+        this.currentFocus = -1;
+        this.timeTillEndOfFocus = 0;
     }
 
     public TeamData(List<String> members, Set<@NotNull Integer> completedFocuses, Integer currentFocus, Integer timeTillEndOfFocus) {
@@ -63,8 +102,19 @@ public class TeamData {
                     Codec.INT.fieldOf("timeTillEndOfFocus").forGetter(t ->t.timeTillEndOfFocus)
                     ).apply(instance, TeamData::new)
             );
+    public static final StreamCodec<FriendlyByteBuf, TeamData> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.STRING_UTF8, TeamData::teamName,
+                    ByteBufCodecs.STRING_UTF8, TeamData::leaderName,
+                    ByteBufCodecs.INT, TeamData::color,
+                    RONStreamCodecs.STRING_LIST_CODEC, TeamData::members,
+                    RONStreamCodecs.INT_SET_CODEC, TeamData::completedFocuses,
+                    ByteBufCodecs.INT, TeamData::currentFocus,
+                    ByteBufCodecs.INT, TeamData::timeTillEndOfFocus,
+                    TeamData::new
+            );
 
-    public TeamData(String teamName, String leaderName, Integer color, List<String> members, HashSet<Integer> completedFocuses, Integer currentFocus, Integer timeTillEndOfFocus) {
+    public TeamData(String teamName, String leaderName, Integer color, List<String> members, Set<Integer> completedFocuses, Integer currentFocus, Integer timeTillEndOfFocus) {
         this.teamName = teamName;
         this.leaderName = leaderName;
         this.color = color;

@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 
 import java.util.List;
-
+//TODO: Send the whole Data rather than selective one
 public record SendTeamDataToScreen(String teamName, String leaderName, List<String> players) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SendTeamDataToScreen> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(RiseofNations.MODID, "screen_data"));
 

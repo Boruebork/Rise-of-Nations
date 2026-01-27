@@ -26,10 +26,11 @@ public class FocusEvents {
         }
     }*/
     @SubscribeEvent
-    public static void onFocusStarted(FocusStartedEvent event){
+    @Deprecated(forRemoval = true)
+    public static void onFocusStarted(FocusStartedEvent event){/*
         RiseofNations.teams.TEAMS.get(event.getTeam()).currentFocus = event.getFocusId();
         RiseofNations.teams.TEAMS.get(event.getTeam()).timeTillEndOfFocus = event.getPlayer().level().registryAccess().lookupOrThrow(ModRegistries.FOCUS_KEY).stream().toList().get(event.getFocusId()).timeInTicks;
-        System.out.println("Started focus!");
+        System.out.println("Started focus!");*/
 
     }
 }

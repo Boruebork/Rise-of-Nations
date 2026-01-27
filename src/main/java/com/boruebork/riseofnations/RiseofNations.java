@@ -75,15 +75,15 @@ public class RiseofNations {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         teams = event.getServer().overworld().getDataStorage().computeIfAbsent(Teams.NEW_ID);
-        if (teams != null){
+        /*if (teams != null){
             teams.TEAMS = Teams.fromSerializable(teams.teamsForDat);
-        }
+        }*/
         LOGGER.info("HELLO from server starting");
     }
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event){
         if (teams != null){
-            teams.teamsForDat = Teams.toSerialized(teams.TEAMS);
+            //teams.teamsForDat = Teams.toSerialized(teams.TEAMS);
             teams.setDirty();
         }
     }
