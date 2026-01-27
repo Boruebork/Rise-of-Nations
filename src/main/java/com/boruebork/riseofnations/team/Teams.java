@@ -10,6 +10,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import java.util.*;
 
 public class Teams extends SavedData {
+    @Deprecated(since = "now", forRemoval = true)
     public Map<Team, TeamData> TEAMS = new HashMap<>();
     public Map<String, TeamEntry> teamsForDat = new HashMap<>();
 
@@ -72,6 +73,26 @@ public class Teams extends SavedData {
         return out;
     }
     // WORKS BASED ON THE CACHE (NULL-PROOF)
+    public static TeamData getData(Team team){
+        if (team == null) return null;
+        for (Team team1 : RiseofNations.teams.TEAMS.keySet()){
+            if (team == team1){
+                return RiseofNations.teams.TEAMS.get(team);
+            }
+        }
+        return null;
+    }
+    public static void playerJoinTeam(String team, String player){
+        if (team == null || player == null){
+            return;
+        }
+        for (Team t : RiseofNations.teams.TEAMS.keySet()){
+            if (t.name == team){
+                RiseofNations.teams.TEAMS.get(t).members.add(player);
+                return;
+            }
+        }
+    }
     public static void changeLeader(String teamName, String newLeaderName){
         //TODO Do smth we need to simplify the key to an id and merge Team and TeamData
         for (Team team : RiseofNations.teams.TEAMS.keySet()){

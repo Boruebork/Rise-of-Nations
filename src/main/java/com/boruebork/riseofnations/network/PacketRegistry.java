@@ -57,5 +57,10 @@ public class PacketRegistry {
                 LeaveTeamPacket.STREAM_CODEC,
                 ServerPayloadHadler::playerLeaveTeam
         );
+        registrar.playToServer(
+                JoinTeamPacket.TYPE,
+                JoinTeamPacket.STREAM_CODEC,
+                ServerPayloadHadler::playerJoinTeam
+        )
     }
 }

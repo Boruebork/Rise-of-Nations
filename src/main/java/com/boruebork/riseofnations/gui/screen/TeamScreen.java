@@ -1,8 +1,10 @@
 package com.boruebork.riseofnations.gui.screen;
 
 import com.boruebork.riseofnations.RiseofNations;
+import com.boruebork.riseofnations.gui.buttons.TeamList;
 import com.boruebork.riseofnations.gui.buttons.TextureButton;
 import com.boruebork.riseofnations.network.packets.CreateNewTeamData;
+import com.boruebork.riseofnations.network.packets.JoinTeamPacket;
 import com.boruebork.riseofnations.network.packets.LeaveTeamPacket;
 import com.boruebork.riseofnations.network.packets.RequestTeamData;
 import com.boruebork.riseofnations.team.TeamEntry;
@@ -15,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,7 +57,7 @@ public class TeamScreen extends Screen {
         }else{
             clearWidgets();
             this.hasTeam = true;
-            Button seeMembers = Button.builder(Component.literal("See Members"), this::seeMemebers).build();
+            Button seeMembers = Button.builder(Component.literal("See Members"), this::seeMembers).build();
             seeMembers.setPosition(0, 20);
             Button focusButton = Button.builder(Component.literal("Focuses"), this::openFocusScreen).build();
             Button leaveTeam = Button.builder(Component.literal("Leave Team"), this::leaveTeam).build();
@@ -83,22 +84,32 @@ public class TeamScreen extends Screen {
     public void acceptNoTeamDataFromServer(){
         System.err.println("No team data accepted from server!");
         clearWidgets();
-        teamButtons = new ArrayList<>();
+        TeamList teamList = new TeamList(minecraft, 150, this.teams.size()*20, 0, 20);
+        teamList.setParent(this);
         int i = 0;
         for (String s : this.teams.keySet()){
             System.out.println(s);
-            teamButtons.add(Button.builder(Component.literal(s), this::onTeamSelected).build());
-            teamButtons.getLast().setPosition(0, 20+20*i);
-            addRenderableWidget(teamButtons.getLast());
+            teamList.addTeam(Component.literal(s), i);
             i++;
         }
         this.teamName = NULL;
+        teamList.setPosition(0, 20);
         rebuildWidgets();
+        addRenderableWidget(teamList);
+    }
+    private Component selectedTeam;
+    public void onTeamSelected(Component name){
+        if (name == null) return;
+        System.err.println(name.getString());
+        selectedTeam = name;
+        Button join = Button.builder(Component.literal("Join"), this::joinTeam).build();
+        join.setPosition(200, 150);
+        addRenderableWidget(join);
     }
 
-    private void onTeamSelected(Button button) {
-        int id = button.getY()/20;
-        
+    private void joinTeam(Button button) {
+        ClientPacketDistributor.sendToServer(new JoinTeamPacket(selectedTeam.getString()));
+
     }
 
     private void openFocusScreen(Button button) {
@@ -115,11 +126,11 @@ public class TeamScreen extends Screen {
         addRenderableWidget(create);
     }
     public void setToMainTeamScreen(){
-        Button button = Button.builder(Component.literal("See Members"), this::seeMemebers).build();
+        Button button = Button.builder(Component.literal("See Members"), this::seeMembers).build();
         button.setPosition(0, 20);
     }
 
-    private void seeMemebers(Button button) {
+    private void seeMembers(Button button) {
         this.seePlayers = true;
         clearWidgets();
         Button toMainMenuButton = Button.builder(Component.literal("To main menu"), this::toMainMenu).build();

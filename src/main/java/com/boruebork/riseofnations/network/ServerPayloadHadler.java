@@ -86,4 +86,12 @@ public class ServerPayloadHadler {
         Teams.kickPlayerFromTeam(leaveTeamPacket.playerName(), leaveTeamPacket.teamName());
         PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendNoTeamDataRoScreen(RiseofNations.teams.teamsForDat));
     }
+
+    public static void playerJoinTeam(JoinTeamPacket joinTeamPacket, IPayloadContext context) {
+        String name = context.player().getName().getString();
+        Team team = Teams.getTeam(joinTeamPacket.team());
+        TeamData data = Teams.getData(team);
+        Teams.playerJoinTeam(joinTeamPacket.team(), name);
+        PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendTeamDataToScreen(team.name, team.leaderName, data.members));
+    }
 }
