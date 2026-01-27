@@ -74,7 +74,7 @@ public class RiseofNations {
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
-        teams = event.getServer().overworld().getDataStorage().computeIfAbsent(Teams.ID);
+        teams = event.getServer().overworld().getDataStorage().computeIfAbsent(Teams.NEW_ID);
         if (teams != null){
             teams.TEAMS = Teams.fromSerializable(teams.teamsForDat);
         }

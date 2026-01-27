@@ -61,6 +61,6 @@ public class PacketRegistry {
                 JoinTeamPacket.TYPE,
                 JoinTeamPacket.STREAM_CODEC,
                 ServerPayloadHadler::playerJoinTeam
-        )
+        );
     }
 }
