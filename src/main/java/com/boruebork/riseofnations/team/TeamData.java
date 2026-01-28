@@ -20,8 +20,8 @@ public class TeamData {
     public String teamName;
     public String leaderName;
     public int color;
-    public List<String> members;
-    public Set<Integer> completedFocuses;
+    public List<String> members = new ArrayList<>();
+    public Set<Integer> completedFocuses = new HashSet<>();
     public int currentFocus;
     public int timeTillEndOfFocus;
 
@@ -54,10 +54,11 @@ public class TeamData {
     }
 
     public TeamData(List<String> members, Set<Integer> completedFocuses){
-        this.members = members;
-        this.completedFocuses = completedFocuses;
+        this.members = new ArrayList<>(members);
+        this.completedFocuses = new HashSet<>(completedFocuses);
         this.currentFocus = -1;
         this.timeTillEndOfFocus = 0;
+
     }
     public TeamData(String creatorName){
         this.members = new ArrayList<>();
@@ -68,17 +69,17 @@ public class TeamData {
     }
     /**This constructor is use to create new teams**/
     public TeamData(String teamName, String creatorName, List<String> members) {
-        this.teamName =teamName;
+        this.teamName = teamName;
         this.leaderName = creatorName;
-        this.members = members;
+        this.members = new ArrayList<>(members);
         this.completedFocuses = new HashSet<>();
         this.currentFocus = -1;
         this.timeTillEndOfFocus = 0;
     }
 
     public TeamData(List<String> members, Set<@NotNull Integer> completedFocuses, Integer currentFocus, Integer timeTillEndOfFocus) {
-        this.members = members;
-        this.completedFocuses = completedFocuses;
+        this.members = new ArrayList<>(members);
+        this.completedFocuses = new HashSet<>(completedFocuses);
         this.currentFocus = currentFocus;
         this.timeTillEndOfFocus = timeTillEndOfFocus;
     }
@@ -118,8 +119,8 @@ public class TeamData {
         this.teamName = teamName;
         this.leaderName = leaderName;
         this.color = color;
-        this.members = members;
-        this.completedFocuses = completedFocuses;
+        this.members = new ArrayList<>(members);
+        this.completedFocuses = new HashSet<>(completedFocuses);
         this.currentFocus = currentFocus;
         this.timeTillEndOfFocus = timeTillEndOfFocus;
     }

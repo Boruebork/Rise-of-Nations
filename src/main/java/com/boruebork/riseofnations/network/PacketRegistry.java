@@ -2,7 +2,6 @@ package com.boruebork.riseofnations.network;
 
 import com.boruebork.riseofnations.RiseofNations;
 import com.boruebork.riseofnations.network.packets.*;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -19,7 +18,7 @@ public class PacketRegistry {
         registrar.playToServer(
                 RequestTeamData.TYPE,
                 RequestTeamData.STREAM_CODEC,
-                ServerPayloadHadler::handleTeamDataRequest
+                ServerPayloadHandler::handleTeamDataRequest
         );
         registrar.playToClient(
                 SendTeamDataToScreen.TYPE,
@@ -28,12 +27,12 @@ public class PacketRegistry {
         registrar.playToServer(
                 CreateNewTeamData.TYPE,
                 CreateNewTeamData.STREAM_CODEC,
-                ServerPayloadHadler::createNewTeam
+                ServerPayloadHandler::createNewTeam
         );
         registrar.playToServer(
                 RequestFocusData.TYPE,
                 RequestFocusData.STREAM_CODEC,
-                ServerPayloadHadler::requestFocusData
+                ServerPayloadHandler::requestFocusData
         );
         registrar.playToClient(
                 SendFocusDataToScreen.TYPE,
@@ -42,7 +41,7 @@ public class PacketRegistry {
         registrar.playToServer(
                 StartFocusOnServer.TYPE,
                 StartFocusOnServer.STREAM_CODEC,
-                ServerPayloadHadler::startFocusOnServer
+                ServerPayloadHandler::startFocusOnServer
         );
         registrar.playToClient(
                 FocusFinishedPacket.TYPE,
@@ -55,12 +54,12 @@ public class PacketRegistry {
         registrar.playToServer(
                 LeaveTeamPacket.TYPE,
                 LeaveTeamPacket.STREAM_CODEC,
-                ServerPayloadHadler::playerLeaveTeam
+                ServerPayloadHandler::playerLeaveTeam
         );
         registrar.playToServer(
                 JoinTeamPacket.TYPE,
                 JoinTeamPacket.STREAM_CODEC,
-                ServerPayloadHadler::playerJoinTeam
+                ServerPayloadHandler::playerJoinTeam
         );
     }
 }

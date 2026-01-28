@@ -1,6 +1,6 @@
 package com.boruebork.riseofnations.gui.buttons;
 
-import com.boruebork.riseofnations.gui.screen.TeamScreen;
+import com.boruebork.riseofnations.gui.screen.team.TeamScreen;
 import com.boruebork.riseofnations.gui.utik.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

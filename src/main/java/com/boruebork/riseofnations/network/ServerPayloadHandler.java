@@ -2,33 +2,30 @@ package com.boruebork.riseofnations.network;
 
 import com.boruebork.riseofnations.RiseofNations;
 import com.boruebork.riseofnations.api.ModRegistries;
-import com.boruebork.riseofnations.focus.events.FocusStartedEvent;
 import com.boruebork.riseofnations.network.packets.*;
-import com.boruebork.riseofnations.team.Team;
 import com.boruebork.riseofnations.team.TeamData;
 import com.boruebork.riseofnations.team.Teams;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
 @EventBusSubscriber(modid = RiseofNations.MODID)
-public class ServerPayloadHadler {
+public class ServerPayloadHandler {
     //On the (server) <- client
 
     public static void handleTeamDataRequest(RequestTeamData packet, IPayloadContext context){
         boolean flag = true;
         String name = packet.playerName();
         ServerPlayer sender = (ServerPlayer) context.player();
-        for (TeamData value : RiseofNations.teams.NEW_TEAMS){
+        for (int i = 0; i < RiseofNations.teams.NEW_TEAMS.size(); ++i){
+            TeamData value = RiseofNations.teams.NEW_TEAMS.get(i);
             if (value.members.contains(packet.playerName())){
-                PacketDistributor.sendToPlayer(sender, new SendTeamDataToScreen(value.teamName, value.leaderName, value.members));
+                PacketDistributor.sendToPlayer(sender, new SendTeamDataToScreen(RiseofNations.teams.NEW_TEAMS, i));
                 flag = false;
             }
         }
@@ -40,19 +37,20 @@ public class ServerPayloadHadler {
     }
 
     public static void createNewTeam(CreateNewTeamData data, IPayloadContext context) {
+        //if (Teams.getPlayerTeamAsString(data.creatorsName()) == null) return;
         String teamName = data.newTeamName();
         for (TeamData team : RiseofNations.teams.NEW_TEAMS){
-            if (Objects.equals(team.leaderName, teamName)){
+            if (Objects.equals(team.teamName, teamName)){
                 return;
             }
         }
         List<String> list = new ArrayList<>();
-        /*List<ServerPlayer> serverPlayerList = new ArrayList<>();
-        serverPlayerList.add((ServerPlayer) context.player());*/
         list.add(data.creatorsName());
+        //TODO Remove magical player
         list.add("Is it really you?");
         RiseofNations.teams.NEW_TEAMS.add(new TeamData(data.newTeamName(), data.creatorsName(), list));
-        PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendTeamDataToScreen(data.newTeamName(), data.creatorsName(),list));
+        int id = RiseofNations.teams.NEW_TEAMS.size() - 1;
+        PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendTeamDataToScreen(RiseofNations.teams.NEW_TEAMS, id));
         System.err.println("Created new Team" + data.newTeamName() + "!");
     }
 
@@ -88,8 +86,8 @@ public class ServerPayloadHadler {
 
     public static void playerJoinTeam(JoinTeamPacket joinTeamPacket, IPayloadContext context) {
         String name = context.player().getName().getString();
-        TeamData team = Teams.getTeam(joinTeamPacket.team());
         Teams.playerJoinTeam(joinTeamPacket.team(), name);
-        PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendTeamDataToScreen(team.teamName, team.leaderName, team.members));
+
+        PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new SendTeamDataToScreen(RiseofNations.teams.NEW_TEAMS, joinTeamPacket.team()));
     }
 }

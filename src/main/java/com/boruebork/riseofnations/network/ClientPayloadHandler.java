@@ -1,7 +1,8 @@
 package com.boruebork.riseofnations.network;
 
 import com.boruebork.riseofnations.gui.screen.FocusScreen;
-import com.boruebork.riseofnations.gui.screen.TeamScreen;
+import com.boruebork.riseofnations.gui.screen.team.TeamScreen;
+import com.boruebork.riseofnations.gui.screen.team.TeamScreenState;
 import com.boruebork.riseofnations.network.packets.FocusFinishedPacket;
 import com.boruebork.riseofnations.network.packets.SendFocusDataToScreen;
 import com.boruebork.riseofnations.network.packets.SendNoTeamDataRoScreen;
@@ -13,17 +14,16 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPayloadHandler {
     //server -> (client)
-    private Minecraft MC = Minecraft.getInstance();
-
 
     public static void sendTeamDataToScreen(final SendTeamDataToScreen data, final IPayloadContext context){
         Screen screen = Minecraft.getInstance().screen;
         if (screen != null){
             if (screen instanceof TeamScreen teamScreen){
-                teamScreen.teamName = data.teamName();
-                teamScreen.leaderName = data.leaderName();
-                teamScreen.players = data.players();
-                teamScreen.rebuildWidgets();
+                teamScreen.teams = data.teams();
+                teamScreen.thisTeamData = data.teams().get(data.id());
+                teamScreen.teamID = data.id();
+                teamScreen.setState(TeamScreenState.MAIN);
+                teamScreen.newRebuildWidgets();
 
                 System.err.println("Forwarded data to the screen");
             }
@@ -46,10 +46,11 @@ public class ClientPayloadHandler {
     }
 
     public static void sendNoTeamDataToScreen(SendNoTeamDataRoScreen sendNoTeamDataRoScreen, IPayloadContext context) {
-        System.err.println("SendNoTeamDataRoScreen");
+        System.err.println("SendNoTeamDataToScreen");
         if (Minecraft.getInstance().screen instanceof TeamScreen teamScreen){
             teamScreen.teams = sendNoTeamDataRoScreen.teams();
-            teamScreen.acceptNoTeamDataFromServer();
+            teamScreen.setState(TeamScreenState.NO_TEAM);
+            teamScreen.newRebuildWidgets();
         }
     }
 }

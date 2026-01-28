@@ -1,7 +1,7 @@
 package com.boruebork.riseofnations.gui;
 
 import com.boruebork.riseofnations.RiseofNations;
-import com.boruebork.riseofnations.gui.screen.TeamScreen;
+import com.boruebork.riseofnations.gui.screen.team.TeamScreen;
 import com.boruebork.riseofnations.keys.KeyBindings;
 import com.boruebork.riseofnations.network.packets.RequestTeamData;
 import net.minecraft.client.Minecraft;

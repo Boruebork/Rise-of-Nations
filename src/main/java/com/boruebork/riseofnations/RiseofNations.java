@@ -29,8 +29,6 @@ public class RiseofNations {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static Teams teams = null;
-    // Create a Deferred Register to hold Blocks which will all be registered under the "riseofnations" namespace
-    // Creates a creative tab with the id "riseofnations:example_tab" for the example item, that is placed after the combat tab
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public RiseofNations(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
@@ -52,22 +50,10 @@ public class RiseofNations {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.LOG_DIRT_BLOCK.getAsBoolean()) {
-            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-        }
-
-        LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(), Config.MAGIC_NUMBER.getAsInt());
-
-        Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
     }
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-
-        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -75,25 +61,13 @@ public class RiseofNations {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         teams = event.getServer().overworld().getDataStorage().computeIfAbsent(Teams.NEW_ID);
-        /*if (teams != null){
-            teams.TEAMS = Teams.fromSerializable(teams.teamsForDat);
-        }*/
+        teams.unMute();
         LOGGER.info("HELLO from server starting");
     }
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event){
         if (teams != null){
-            //teams.teamsForDat = Teams.toSerialized(teams.TEAMS);
             teams.setDirty();
         }
     }
-   /* @SubscribeEvent
-    public void onEntityHurt(AttackEntityEvent event){
-        Entity entity = event.getTarget();
-        if (entity instanceof Player){
-            Player target = (Player) entity;
-            Player attacker = event.getEntity();
-            if (Teams.playersOnSameTeam(target, attacker));
-        }
-    }*/
 }

@@ -29,7 +29,7 @@ public class FocusScreen extends Screen {
     private List<FocusData> focusData;
     private List<Button> focusButtons;
 
-    protected FocusScreen() {
+    public FocusScreen() {
         super(Component.literal("Focus Screen"));
     }
 

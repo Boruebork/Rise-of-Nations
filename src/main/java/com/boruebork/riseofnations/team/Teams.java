@@ -10,32 +10,14 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import java.util.*;
 
 public class Teams extends SavedData {
-    @Deprecated(since = "0.0.1", forRemoval = true)
-    public Map<Team, TeamData> TEAMS = new HashMap<>();
-    public Map<String, TeamEntry> teamsForDat = new HashMap<>();
-    //TODO: change All methods to work based on this one
     public List<TeamData> NEW_TEAMS = new ArrayList<>();
 
     public Teams() {
-        this.TEAMS = new HashMap<>();
+        this.NEW_TEAMS = new ArrayList<>();
     }
-
-    public Teams(Map<String, TeamEntry> teams) {
-        this.teamsForDat = new HashMap<>(teams);
+    public void unMute(){
+        this.NEW_TEAMS = new ArrayList<>(this.NEW_TEAMS);
     }
-
-    /*public static final Codec<Teams> CODEC =
-            RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.unboundedMap(
-                                    Codec.STRING,
-                                    TeamEntry.CODEC
-                            ).fieldOf("teams")
-                            .forGetter(t -> t.teamsForDat)
-            ).apply(instance, Teams::new));
-
-    public static final SavedDataType<Teams> ID =
-            new SavedDataType<>("teams", Teams::new, CODEC);*/
-
 
     public static final Codec<Teams> NEW_CODEC =
             RecordCodecBuilder.create(instance -> instance.group(
@@ -52,57 +34,12 @@ public class Teams extends SavedData {
         this.NEW_TEAMS = objects;
     }
 
-
-    /*
-    @Deprecated(forRemoval = true)
-    public static Map<Team, TeamData> fromSerializable(Map<String, TeamEntry> data){
-        Map<Team, TeamData> out = new HashMap<>();
-
-        for (TeamEntry e : data.values()) {
-            Team team = new Team(e.name, e.leaderName);
-            TeamData td = new TeamData();
-
-            td.members = new ArrayList<>(e.members);
-            td.completedFocuses = new HashSet<>(e.completedFocuses);
-            td.currentFocus = e.currentFocus;
-            td.timeTillEndOfFocus = e.timeTillEndOfCurrentFocus;
-
-            out.put(team, td);
+    // WORKS BASED ON THE NEW TEAMS (NULL-PROOF)
+    public static void playerJoinTeam(int teamID, String playerName){
+        if (playerName == null){
+            return;
         }
-        return out;
-    }
-    @Deprecated(forRemoval = true)
-    public static Map<String, TeamEntry> toSerialized(Map<Team, TeamData> teams){
-        Map<String, TeamEntry> out = new HashMap<>();
-
-        for (var entry : teams.entrySet()) {
-            Team t = entry.getKey();
-            TeamData d = entry.getValue();
-
-            out.put(t.name, new TeamEntry(
-                    t.name,
-                    t.leaderName,
-                    t.color,
-                    List.copyOf(d.members),
-                    new HashSet<>(d.completedFocuses),
-                    d.currentFocus,
-                    d.timeTillEndOfFocus
-            ));
-        }
-        return out;
-    }*/
-
-
-
-    // WORKS BASED ON THE CACHE (NULL-PROOF)
-    public static TeamData getData(Team team){
-        if (team == null) return null;
-        for (Team team1 : RiseofNations.teams.TEAMS.keySet()){
-            if (team == team1){
-                return RiseofNations.teams.TEAMS.get(team);
-            }
-        }
-        return null;
+        RiseofNations.teams.NEW_TEAMS.get(teamID).members.add(playerName);
     }
     public static void playerJoinTeam(String teamName, String playerName){
         if (teamName == null || playerName == null){
