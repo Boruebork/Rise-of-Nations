@@ -1,36 +1,35 @@
 package com.boruebork.riseofnations.focus;
 
 import com.boruebork.riseofnations.RiseofNations;
-import com.boruebork.riseofnations.api.ModRegistries;
 import com.boruebork.riseofnations.focus.events.FocusStartedEvent;
-import com.boruebork.riseofnations.network.packets.FocusFinishedPacket;
 import com.boruebork.riseofnations.focus.events.FocusFinishedEvent;
-import com.boruebork.riseofnations.team.Team;
-import com.boruebork.riseofnations.team.Teams;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.api.distmarker.Dist;
+import com.boruebork.riseofnations.team.TeamData;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-@EventBusSubscriber(value = Dist.DEDICATED_SERVER, modid = RiseofNations.MODID)
+@EventBusSubscriber(modid = RiseofNations.MODID)
 public class FocusEvents {
-    //@SubscribeEvent
-    /*public static void onFocusFinished(FocusFinishedEvent event){
-        Team team = event.getTeam();
-        RiseofNations.teams.TEAMS.get(team).completedFocuses.add(event.getFocusId());
-        for (ServerPlayer player : RiseofNations.teams.TEAMS.get(team).membersAsServerPlayers){
-            PacketDistributor.sendToPlayer(player, new FocusFinishedPacket(event.getFocusId()));
-            player.sendSystemMessage(Component.literal("Finished focus " + event.getFocusId()));
-        }
-    }*/
     @SubscribeEvent
-    @Deprecated(forRemoval = true)
-    public static void onFocusStarted(FocusStartedEvent event){/*
-        RiseofNations.teams.TEAMS.get(event.getTeam()).currentFocus = event.getFocusId();
-        RiseofNations.teams.TEAMS.get(event.getTeam()).timeTillEndOfFocus = event.getPlayer().level().registryAccess().lookupOrThrow(ModRegistries.FOCUS_KEY).stream().toList().get(event.getFocusId()).timeInTicks;
-        System.out.println("Started focus!");*/
-
+    public static void serverTick(ServerTickEvent.Post event){
+        for (TeamData team : RiseofNations.teams.NEW_TEAMS){
+            if (team.currentFocus == -1) return;
+            team.timeTillEndOfFocus--;
+            if (team.timeTillEndOfFocus <= 0 && team.currentFocus != 1){
+                NeoForge.EVENT_BUS.post(new FocusFinishedEvent(team, team.currentFocus));
+                team.timeTillEndOfFocus = 0;
+                team.completedFocuses.add(team.currentFocus);
+                team.currentFocus = -1;
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void onFocusFinished(FocusFinishedEvent event){
+        System.out.println("FocusFinishedEvent");
+    }
+    @SubscribeEvent
+    public static void onFocusStarted(FocusStartedEvent event){
+        System.out.println("FocusStartedEvent");
     }
 }

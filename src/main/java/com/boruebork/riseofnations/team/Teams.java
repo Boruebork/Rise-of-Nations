@@ -15,6 +15,9 @@ public class Teams extends SavedData {
     public Teams() {
         this.NEW_TEAMS = new ArrayList<>();
     }
+
+
+
     public void unMute(){
         this.NEW_TEAMS = new ArrayList<>(this.NEW_TEAMS);
     }
@@ -183,5 +186,14 @@ public class Teams extends SavedData {
             }
         }
         return null;
+    }
+    public static int getPlayerTeamAsId(String string) {
+        if (string == null) return -1;
+        for (int i = 0; i < RiseofNations.teams.NEW_TEAMS.size(); ++i){
+            if (RiseofNations.teams.NEW_TEAMS.get(i).members.contains(string)){
+                return i;
+            }
+        }
+        return -1;
     }
 }

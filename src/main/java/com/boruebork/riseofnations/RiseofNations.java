@@ -1,16 +1,16 @@
 package com.boruebork.riseofnations;
 
+import com.boruebork.riseofnations.block.ModBlocks;
 import com.boruebork.riseofnations.focus.ModFocuses;
-import com.boruebork.riseofnations.team.FocusManager;
+import com.boruebork.riseofnations.item.ModItems;
+import com.boruebork.riseofnations.team.DataAttachments;
 import com.boruebork.riseofnations.team.Teams;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -36,10 +36,12 @@ public class RiseofNations {
 
         // Register ourselves for server and other game events we are interested in.
         ModFocuses.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        DataAttachments.register(modEventBus);
         // Note that this is necessary if and only if we want *this* class (RiseofNations) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
-        NeoForge.EVENT_BUS.register(FocusManager.class);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
@@ -54,6 +56,9 @@ public class RiseofNations {
 
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS){
+            event.accept(ModBlocks.CLAIM_BLOCK);
+        }
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

@@ -2,6 +2,7 @@ package com.boruebork.riseofnations.network;
 
 import com.boruebork.riseofnations.RiseofNations;
 import com.boruebork.riseofnations.network.packets.*;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -21,8 +22,8 @@ public class PacketRegistry {
                 ServerPayloadHandler::handleTeamDataRequest
         );
         registrar.playToClient(
-                SendTeamDataToScreen.TYPE,
-                SendTeamDataToScreen.STREAM_CODEC
+                TeamDataPacket.TYPE,
+                TeamDataPacket.STREAM_CODEC
         );
         registrar.playToServer(
                 CreateNewTeamData.TYPE,
@@ -48,8 +49,8 @@ public class PacketRegistry {
                 FocusFinishedPacket.STREAM_CODEC
         );
         registrar.playToClient(
-                SendNoTeamDataRoScreen.TYPE,
-                SendNoTeamDataRoScreen.STREAM_CODEC
+                NoTeamDataPacket.TYPE,
+                NoTeamDataPacket.STREAM_CODEC
         );
         registrar.playToServer(
                 LeaveTeamPacket.TYPE,
@@ -60,6 +61,20 @@ public class PacketRegistry {
                 JoinTeamPacket.TYPE,
                 JoinTeamPacket.STREAM_CODEC,
                 ServerPayloadHandler::playerJoinTeam
+        );
+        registrar.playToServer(
+                DisbandTeamPacket.TYPE,
+                DisbandTeamPacket.STREAM_CODEC,
+                ServerPayloadHandler::disbandTeam
+        );
+        registrar.playToServer(
+                ChangeTeamDataPacket.TYPE,
+                ChangeTeamDataPacket.STREAM_CODEC,
+                ServerPayloadHandler::changeTeamData
+        );
+        registrar.playToClient(
+                SendFocusStartedToScreen.TYPE,
+                SendFocusStartedToScreen.STREAM_CODEC
         );
     }
 }

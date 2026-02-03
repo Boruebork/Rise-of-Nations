@@ -6,5 +6,6 @@ public enum TeamScreenState {
     MAIN,
     MEMBERS,
     CREATE_TEAM,
-    JOIN_TEAM
+    JOIN_TEAM,
+    EDIT_TEAM
 }

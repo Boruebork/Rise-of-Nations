@@ -1,10 +1,7 @@
 package com.boruebork.riseofnations.network;
 
 import com.boruebork.riseofnations.RiseofNations;
-import com.boruebork.riseofnations.network.packets.FocusFinishedPacket;
-import com.boruebork.riseofnations.network.packets.SendFocusDataToScreen;
-import com.boruebork.riseofnations.network.packets.SendNoTeamDataRoScreen;
-import com.boruebork.riseofnations.network.packets.SendTeamDataToScreen;
+import com.boruebork.riseofnations.network.packets.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -16,7 +13,7 @@ public class ClientPacketRegitry {
     @SubscribeEvent // on the mod event bus only on the physical client
     public static void register(RegisterClientPayloadHandlersEvent event) {
         event.register(
-                SendTeamDataToScreen.TYPE,
+                TeamDataPacket.TYPE,
                 HandlerThread.NETWORK,
                 ClientPayloadHandler::sendTeamDataToScreen
         );
@@ -31,9 +28,14 @@ public class ClientPacketRegitry {
                 ClientPayloadHandler::sendFinishedFocusToScreen
         );
         event.register(
-                SendNoTeamDataRoScreen.TYPE,
+                NoTeamDataPacket.TYPE,
                 HandlerThread.NETWORK,
                 ClientPayloadHandler::sendNoTeamDataToScreen
+        );
+        event.register(
+                SendFocusStartedToScreen.TYPE,
+                HandlerThread.NETWORK,
+                ClientPayloadHandler::startFocusOnClient
         );
     }
 }

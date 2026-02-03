@@ -1,16 +1,15 @@
 package com.boruebork.riseofnations.focus.events;
 
-import com.boruebork.riseofnations.team.Team;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.Event;
 
 public class FocusStartedEvent extends Event {
     private int focusId;
-    private Team team;
+    private int teamId;
     private ServerPlayer player;
-    public FocusStartedEvent(int focusId, Team team, ServerPlayer player){
+    public FocusStartedEvent(int focusId, int teamId, ServerPlayer player){
         this.focusId = focusId;
-        this.team = team;
+        this.teamId = teamId;
         this.player = player;
     }
 
@@ -18,8 +17,8 @@ public class FocusStartedEvent extends Event {
         return player;
     }
 
-    public Team getTeam() {
-        return team;
+    public int getTeamId() {
+        return teamId;
     }
 
     public int getFocusId() {

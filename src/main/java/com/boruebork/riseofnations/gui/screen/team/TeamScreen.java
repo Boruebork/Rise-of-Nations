@@ -1,11 +1,9 @@
 package com.boruebork.riseofnations.gui.screen.team;
 
 import com.boruebork.riseofnations.gui.buttons.TeamList;
-import com.boruebork.riseofnations.gui.screen.FocusScreen;
-import com.boruebork.riseofnations.network.packets.CreateNewTeamData;
-import com.boruebork.riseofnations.network.packets.JoinTeamPacket;
-import com.boruebork.riseofnations.network.packets.LeaveTeamPacket;
-import com.boruebork.riseofnations.network.packets.RequestTeamData;
+import com.boruebork.riseofnations.gui.screen.focus.FocusScreen;
+import com.boruebork.riseofnations.gui.util.Colors;
+import com.boruebork.riseofnations.network.packets.*;
 import com.boruebork.riseofnations.team.TeamData;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -15,24 +13,17 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
 import java.util.List;
-import java.util.Objects;
-
-import static com.boruebork.riseofnations.network.NetowrkConstants.NULL;
 
 public class TeamScreen extends Screen {
     //=========================DATA=========================
-    //TODO Another architecture shift, make data, thisTeamData and teamID the gods of this class
-    //TODO Rebuild this mess into a clean system with TeamScreenState
     public List<TeamData> teams;
     public TeamData thisTeamData;
     public int teamID;
 
     public TeamScreenState state;
-    //====For removal=======
-    @Deprecated(forRemoval = true)
-    public boolean hasTeam;
     public TeamScreen() {
         super(Component.translatable("gui.riseofnations.team"));
+        this.state = TeamScreenState.LOADING;
     }
     public void setState(TeamScreenState state){
         this.state = state;
@@ -45,37 +36,7 @@ public class TeamScreen extends Screen {
         super.init();
     }
 
-    /*@Deprecated(forRemoval = true)
-    public void rebuildWidgets() {
-        if (Objects.equals(this.thisTeamData.teamName, NULL)){
-            this.hasTeam = false;
-            System.out.println("Rebuilt widget for no team");
-            Button button = Button.builder(Component.literal("Create new Team"), this::createNewTeam).build();
-            button.setPosition(0, 0);
-            addRenderableWidget(button);
-        }else{
-            clearWidgets();
-            this.hasTeam = true;
-            Button seeMembers = Button.builder(Component.literal("See Members"), this::seeMembers).build();
-            seeMembers.setPosition(0, 20);
-            Button focusButton = Button.builder(Component.literal("Focuses"), this::openFocusScreen).build();
-            Button leaveTeam = Button.builder(Component.literal("Leave Team"), this::leaveTeam).build();
-            Button destroyTeam = Button.builder(Component.literal("Disband Team"), this::destroyTeam).build();
-            focusButton.setPosition(this.width - 150, 0);
-            leaveTeam.setPosition(this.width-150, 20);
-            destroyTeam.setPosition(this.width -150, 40);
-            addRenderableWidget(leaveTeam);
-            addRenderableWidget(destroyTeam);
-            addRenderableWidget(focusButton);
-            addRenderableWidget(seeMembers);
-            System.out.println("Rebuilt widget!");
-        }
-
-    }*/
     public void newRebuildWidgets(){
-        /*//TODO: Questionable
-        if (thisTeamData == null && state == TeamScreenState.MAIN) this.state = TeamScreenState.NO_TEAM;
-        else this.state = TeamScreenState.MAIN;*/
         System.err.println(state);
         clearWidgets();
         switch (state){
@@ -85,10 +46,27 @@ public class TeamScreen extends Screen {
             case MAIN -> rebuildMain();
             case LOADING -> rebuildLoading();
             case MEMBERS -> rebuildMembers();
+            case EDIT_TEAM -> rebuildEditTeam();
         }
 
     }
+
+
     //======================================Rebuilders==================================================================
+    EditBox editTeamName;
+    private void rebuildEditTeam() {
+        editTeamName = new EditBox(this.font, 100, 20, Component.literal("team name"));
+        editTeamName.setValue(this.thisTeamData.teamName());
+        Button save = Button.builder(Component.literal("Save"), this::save).build();
+        Button cancel = Button.builder(Component.literal("Cancel"), this::cancelSave).build();
+        save.setPosition(0, this.height - 20);
+        cancel.setPosition(this.width - 150, this.height-20);
+        editTeamName.setPosition(100, 100);
+        addRenderableWidget(save);
+        addRenderableWidget(editTeamName);
+        addRenderableWidget(cancel);
+
+    }
 
     private void rebuildMembers() {
         Button toMainMenuButton = Button.builder(Component.literal("To main menu"), this::toMainMenu).build();
@@ -105,15 +83,25 @@ public class TeamScreen extends Screen {
         Button focusButton = Button.builder(Component.literal("Focuses"), this::openFocusScreen).build();
         Button leaveTeam = Button.builder(Component.literal("Leave Team"), this::leaveTeam).build();
         Button destroyTeam = Button.builder(Component.literal("Disband Team"), this::destroyTeam).build();
+        Button editTeam = Button.builder(Component.literal("Edit Team"), this::editTeam).build();
         focusButton.setPosition(this.width - 150, 0);
         leaveTeam.setPosition(this.width-150, 20);
         destroyTeam.setPosition(this.width -150, 40);
+        editTeam.setPosition(this.width -150, 60);
         addRenderableWidget(leaveTeam);
         addRenderableWidget(destroyTeam);
         addRenderableWidget(focusButton);
         addRenderableWidget(seeMembers);
+        addRenderableWidget(editTeam);
         System.out.println("Rebuilt widget!");
+        System.err.println(this.thisTeamData.teamName());
     }
+
+    private void editTeam(Button button) {
+        this.setState(TeamScreenState.EDIT_TEAM);
+        newRebuildWidgets();
+    }
+
     EditBox teamNameEditbox;
     private void rebuildCreateTeam() {
         teamNameEditbox = new EditBox(this.font,0,0, 100, 20, Component.literal("Team Name"));
@@ -125,9 +113,6 @@ public class TeamScreen extends Screen {
 
     //TODO do some physical stuff
     private void rebuildJoinTeam() {
-        /*if (name == null) return;
-        System.err.println(name.getString());
-        selectedTeam = name;*/
         Button join = Button.builder(Component.literal("Join"), this::joinTeam).build();
         join.setPosition(200, 150);
         addRenderableWidget(join);
@@ -143,24 +128,34 @@ public class TeamScreen extends Screen {
         int i = 0;
         for (TeamData data : this.teams){
             System.out.println(data.teamName);
-            teamList.addTeam(Component.literal(data.teamName), i);
+            teamList.addTeam(Component.literal(data.teamName), i, data.color());
             i++;
         }
         //this.teamName = NULL;
-        teamList.setPosition(0, 20);
+        teamList.setPosition(0, 25);
         addRenderableWidget(button);
         addRenderableWidget(teamList);
     }
     //================================Tranistors and Packeters===========================//
+    private void cancelSave(Button button) {
+        this.setState(TeamScreenState.MAIN);
+        newRebuildWidgets();
+    }
 
+    private void save(Button button) {
+        if (editTeamName.getValue().length() > 100) return;
+        ClientPacketDistributor.sendToServer(new ChangeTeamDataPacket(this.teamID,editTeamName.getValue()));
+    }
     private void destroyTeam(Button button) {
+        ClientPacketDistributor.sendToServer(new DisbandTeamPacket(this.teamID));
     }
 
     private void leaveTeam(Button button) {
         ClientPacketDistributor.sendToServer(new LeaveTeamPacket(minecraft.player.getName().getString(), this.thisTeamData.teamName));
     }
     private int selectedTeamIdx;
-    public void onTeamSelected(Component name){
+    public void onTeamSelected(int id){
+        selectedTeamIdx = id;
         this.state = TeamScreenState.JOIN_TEAM;
         newRebuildWidgets();
     }
@@ -198,17 +193,20 @@ public class TeamScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
-        guiGraphics.drawString(this.font,  this.thisTeamData == null ? "" : this.thisTeamData.teamName,this.width/2, 0, 0xFFFFFFFF);
-        if (this.state == TeamScreenState.MEMBERS){
-            for (int i = 0; i < this.thisTeamData.members.size(); ++i){
-                guiGraphics.drawString(this.getFont(), this.thisTeamData.members.get(i), 0, i*10, 0xFFFFFFFF);
+        guiGraphics.drawString(this.font, "State: " + this.state, 0, 0, Colors.GREEN);
+        if (this.state != null){
+            switch (this.state){
+                case JOIN_TEAM -> guiGraphics.drawString(this.font, this.teams.get(selectedTeamIdx).teamName(), this.width/2, 0, Colors.WHITE);
+                case MAIN -> guiGraphics.drawString(this.font,  this.thisTeamData == null ? "" : this.thisTeamData.teamName,this.width/2, 0, Colors.WHITE);
+                case EDIT_TEAM -> guiGraphics.drawString(this.font, "Edit Team Settings", this.width/2 - 40, 40, Colors.WHITE);
             }
         }
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.fill(0, 0, this.width, this.height, 0xFFAAAAAA);
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.fill(0, 0, this.width, this.height, 0xFFAAAAAA);
+
 
     }
 }

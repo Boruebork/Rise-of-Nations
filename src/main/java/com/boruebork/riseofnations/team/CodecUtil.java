@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Codecutil {
+public class CodecUtil {
     public static final Codec<Map<String, List<String>>> STRING_LIST_MAP_CODEC =
             Codec.unboundedMap(
                     Codec.STRING,
@@ -17,15 +17,6 @@ public class Codecutil {
             Codec.INT.listOf()
                     .xmap(Set::copyOf, List::copyOf);
 
-    public static final Codec<Team> TEAM_CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Codec.STRING.fieldOf("name")
-                            .forGetter(team -> team.name),
-
-                    Codec.STRING.fieldOf("leader")
-                            .forGetter(team -> team.leaderName)
-            ).apply(instance, Team::new)
-    );
     public static final Codec<TeamData> TEAM_DATA_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.listOf()

@@ -1,4 +1,4 @@
-package com.boruebork.riseofnations.gui.utik;
+package com.boruebork.riseofnations.gui.util;
 
 public class Colors {
     public static final int WHITE = 0xFFFFFFFF;

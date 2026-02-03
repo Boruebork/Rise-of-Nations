@@ -1,14 +1,12 @@
 package com.boruebork.riseofnations.team;
 
-import com.boruebork.riseofnations.focus.FocusData;
+import com.boruebork.riseofnations.gui.util.Colors;
 import com.boruebork.riseofnations.network.util.RONStreamCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -75,6 +73,7 @@ public class TeamData {
         this.completedFocuses = new HashSet<>();
         this.currentFocus = -1;
         this.timeTillEndOfFocus = 0;
+        this.color = Colors.BLUE;
     }
 
     public TeamData(List<String> members, Set<@NotNull Integer> completedFocuses, Integer currentFocus, Integer timeTillEndOfFocus) {
