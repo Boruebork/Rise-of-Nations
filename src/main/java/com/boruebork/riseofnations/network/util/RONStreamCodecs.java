@@ -3,9 +3,12 @@ package com.boruebork.riseofnations.network.util;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.Utf8String;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.ItemStackWithSlot;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
@@ -69,6 +72,19 @@ public class RONStreamCodecs {
                     HashMap::new,             // Factory to create the map
                     ByteBufCodecs.STRING_UTF8, // Key codec
                     ByteBufCodecs.STRING_UTF8  // Value codec
+            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, ItemStackWithSlot> ITEM_STACK_WITH_SLOT =
+            StreamCodec.composite(
+                    ByteBufCodecs.INT,
+                    ItemStackWithSlot::slot,
+                    ItemStack.STREAM_CODEC,
+                    ItemStackWithSlot::stack,
+                    ItemStackWithSlot::new
+            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, List<ItemStackWithSlot>> LIST_OF_ITEMSTACK_WITH_SLOT =
+            ByteBufCodecs.collection(
+                    ArrayList::new,
+                    ITEM_STACK_WITH_SLOT
             );
 }
 

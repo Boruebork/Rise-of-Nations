@@ -2,6 +2,7 @@ package com.boruebork.riseofnations;
 
 import com.boruebork.riseofnations.block.ModBlocks;
 import com.boruebork.riseofnations.focus.ModFocuses;
+import com.boruebork.riseofnations.gui.ModMenuTypes;
 import com.boruebork.riseofnations.item.ModItems;
 import com.boruebork.riseofnations.team.DataAttachments;
 import com.boruebork.riseofnations.team.Teams;
@@ -38,6 +39,7 @@ public class RiseofNations {
         ModFocuses.register(modEventBus);
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
         DataAttachments.register(modEventBus);
         // Note that this is necessary if and only if we want *this* class (RiseofNations) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.

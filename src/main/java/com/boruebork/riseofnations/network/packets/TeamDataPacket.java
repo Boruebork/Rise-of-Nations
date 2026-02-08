@@ -3,6 +3,7 @@ package com.boruebork.riseofnations.network.packets;
 import com.boruebork.riseofnations.RiseofNations;
 import com.boruebork.riseofnations.team.TeamData;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -10,11 +11,10 @@ import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
-//TODO: Send the whole Data rather than selective one
 public record TeamDataPacket(List<TeamData> teams, int id) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<TeamDataPacket> TYPE = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(RiseofNations.MODID, "screen_data"));
 
-    public static final StreamCodec<FriendlyByteBuf, TeamDataPacket> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, TeamDataPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.collection(ArrayList::new, TeamData.STREAM_CODEC),
             TeamDataPacket::teams,
             ByteBufCodecs.INT,

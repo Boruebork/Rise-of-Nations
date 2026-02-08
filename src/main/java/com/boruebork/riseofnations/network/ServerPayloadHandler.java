@@ -4,10 +4,13 @@ import com.boruebork.riseofnations.RiseofNations;
 import com.boruebork.riseofnations.api.ModRegistries;
 import com.boruebork.riseofnations.focus.FocusData;
 import com.boruebork.riseofnations.focus.events.FocusStartedEvent;
+import com.boruebork.riseofnations.gui.screen.inv.SharedInvMenu;
 import com.boruebork.riseofnations.network.packets.*;
 import com.boruebork.riseofnations.team.TeamData;
 import com.boruebork.riseofnations.team.Teams;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -110,4 +113,6 @@ public class ServerPayloadHandler {
         teamData.teamName = data.name();
         PacketDistributor.sendToPlayer((ServerPlayer) context.player(), new TeamDataPacket(RiseofNations.teams.NEW_TEAMS, data.id()));
     }
+
+
 }

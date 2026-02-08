@@ -1,5 +1,8 @@
 package com.boruebork.riseofnations;
 
+import com.boruebork.riseofnations.gui.ModMenuTypes;
+import com.boruebork.riseofnations.gui.screen.inv.SharedInvMenu;
+import com.boruebork.riseofnations.gui.screen.inv.SharedInvScreen;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -7,6 +10,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
@@ -27,5 +31,9 @@ public class RiseofNationsClient {
         // Some client setup code
         RiseofNations.LOGGER.info("HELLO FROM CLIENT SETUP");
         RiseofNations.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+    }
+    @SubscribeEvent
+    static void registerScreens(RegisterMenuScreensEvent event){
+        event.register(ModMenuTypes.SHARED_INV_MENU.get(), SharedInvScreen::new);
     }
 }

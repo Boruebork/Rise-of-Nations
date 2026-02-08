@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(RiseofNations.MODID);
 
-    public static final DeferredBlock<Block> CLAIM_BLOCK = registerBlock("claim_block", Block::new);
+    public static final DeferredBlock<Block> CLAIM_BLOCK = registerBlock("claim_block", ClaimBlock::new);
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> function) {
         DeferredBlock<T> toReturn = BLOCKS.registerBlock(name, function);
