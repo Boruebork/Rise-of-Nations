@@ -86,7 +86,7 @@ public class TeamData {
                     Codec.list(Codec.INT)
                             .xmap(HashSet::new, List::copyOf)
                             .optionalFieldOf("completed_focuses", new HashSet<>())
-                            .forGetter(t -> (HashSet<Integer>) t.completedFocuses),
+                            .forGetter(t -> new HashSet<>(t.completedFocuses)),
                     Codec.INT.fieldOf("currentFocus").forGetter(t -> t.currentFocus),
                     Codec.INT.fieldOf("timeTillEndOfFocus").forGetter(t ->t.timeTillEndOfFocus),
                     Codec.list(ItemStackWithSlot.CODEC).

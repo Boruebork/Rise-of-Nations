@@ -24,7 +24,7 @@ public class SharedInv extends SimpleContainer {
     @Override
     public void setChanged() {
         super.setChanged();
-        saveBackToTeam();
+        if (RiseofNations.teams != null) saveBackToTeam();
     }
 
     private void saveBackToTeam() {
